@@ -1,0 +1,27 @@
+loginMfaVerify:
+  handler: src/handlers/users/loginMfaVerifyHandler.loginMfaVerify
+  events:
+    - http:
+        path: /users/mfa/login-verify
+        method: post
+        cors: true
+
+verifyMfa:
+  handler: verifyMfaHandler.verifyMfa
+  name: survey-training-${self:provider.stage}-verify-mfa
+  package:
+    patterns:
+      - '../../src/service/users_management/verifyMfaHandler.mjs'
+  environment:
+    <<: *envConfig
+  events:
+    - http:
+        path: /users/mfa/verify
+        method: post
+        cors: true
+        authorizer:
+          type: COGNITO_USER_POOLS
+          authorizerId: ${param:ApiGatewayAuthorizerId}
+        request:
+          schemas:
+            application/json: ${file(./schemas/verifyMfa.json)}
