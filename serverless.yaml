@@ -22,4 +22,15 @@ verifyMfa:
         authorizer:
           type: COGNITO_USER_POOLS
           authorizerId: ${param:ApiGatewayAuthorizerId}
-        
+functions:
+
+  getUserMeTest:
+    handler: app/handlers/users.get_user_me_test
+    events:
+      - http:
+          path: users/me/test
+          method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
