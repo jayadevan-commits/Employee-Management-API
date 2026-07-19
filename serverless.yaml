@@ -22,6 +22,4 @@ verifyMfa:
         authorizer:
           type: COGNITO_USER_POOLS
           authorizerId: ${param:ApiGatewayAuthorizerId}
-        request:
-          schemas:
-            application/json: ${file(./schemas/verifyMfa.json)}
+        
