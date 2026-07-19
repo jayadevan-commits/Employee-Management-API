@@ -1,2 +1,5 @@
 Employee Management System
 Version: 2.0
+
+"My current branch is on feature/login-module"
+"there's bug in dev branch that i have worked"
