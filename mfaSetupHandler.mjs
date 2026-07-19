@@ -20,10 +20,6 @@ import {
 
 import { ROLES } from "/opt/nodejs/utils/rbac.mjs";
 
-const MFA_REQUIRED_ROLES = [
-    ROLES.SUPER_ADMIN,
-    ROLES.ORG_ADMIN,
-];
 
 /**
  * @param {import("../../types/global").ApiGatewayEvent} event
@@ -43,14 +39,6 @@ async function handler(event, context, user) {
         userId: user.userId,
     });
 
-    if (!MFA_REQUIRED_ROLES.includes(user.role)) {
-        throw new CustomError(
-            "MFA setup is not required for this role",
-            {
-                code: "MFA_NOT_REQUIRED",
-            }
-        );
-    }
 
     const secretCode = await generateMfaSecret(event,context);
     logger.info("MFA secret generated successfully", {

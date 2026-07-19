@@ -58,10 +58,7 @@ async function handler(event, context) {
 
   logger.info("Starting User Login", { email });
 
-  // ---- DB Validation FIRST (before Cognito auth) ----
-  // Runs before any Cognito call so an inactive account is rejected
-  // immediately — it never reaches the MFA challenge step, so an
-  // inactive user can't get an OTP screen even if MFA is enabled.
+  
   let dbUser;
   try {
     const database = await db;
@@ -72,9 +69,7 @@ async function handler(event, context) {
       .limit(1);
 
     if (!dbUser) {
-      // Checked before Cognito auth now, so this just means "no account
-      // for this email" — treated as INVALID_CREDENTIALS (not
-      // INTERNAL_SERVER_ERROR) to avoid leaking whether an email exists.
+     
       logger.error("Login attempted for email not found in RDS", { email });
       throw new CustomError("Invalid email or password", {
         code: "INVALID_CREDENTIALS",
@@ -103,9 +98,7 @@ async function handler(event, context) {
 
   // user already MFA enabled
   if (tokens.challengeRequired) {
-    // NOTE: `challengeName` is camelCase here (our own response shape),
-    // matching authenticateWithCognito's return value — not the raw
-    // Cognito SDK field `ChallengeName`.
+    
     logger.info("MFA Challenge Required", {
       email,
       challengeName: tokens.challengeName,
@@ -212,11 +205,7 @@ async function authenticateWithCognito({ email, password }, context) {
     logger.info("Cognito Authentication Success", { email });
 
     if (response.ChallengeName === "SOFTWARE_TOKEN_MFA") {
-      // FIX: was `response.challengeName` (lowercase c) — that field
-      // doesn't exist on the AWS SDK response, so it always resolved to
-      // undefined. The real field from Cognito is `ChallengeName`.
-      // We map it into our own camelCase `challengeName` key here so the
-      // rest of our code (handler, frontend) only ever deals with camelCase.
+      
       return {
         challengeRequired: true,
         challengeName: response.ChallengeName,
